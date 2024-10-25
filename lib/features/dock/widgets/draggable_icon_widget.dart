@@ -63,8 +63,14 @@ class DraggableIcon extends StatelessWidget {
         onDragStarted: () {
           controller.startDragging(index);
         },
-        onDragEnd: (_) {
-          controller.resetDrag();
+        onDragEnd: (details) {
+          //If outside the dock then thinking
+          // controller.resetDrag
+
+          //If the drag is inside the dock then reset
+          if (details.wasAccepted) {
+            controller.resetDrag();
+          }
         },
         child: DragTarget<IconDataModel>(
           builder: (context, candidateData, rejectedData) {
@@ -119,6 +125,20 @@ class DraggableIcon extends StatelessWidget {
                 details.offset.dx / (baseItemHeight + 16), targetIndex);
             return true;
           },
+
+          //TODO: Fix It and Think it again
+          // onLeave: (data) {
+          //   if (data != null) {
+          //     final index =
+          //         controller.items.indexWhere((item) => item.id == data.id);
+          //     if (index != -1) {
+          //       final removedItem = controller.items[index];
+          //       controller.removeItem(index);
+          //       // onItem
+          //     }
+          //   }
+          //   controller.resetDrag();
+          // },
           onAcceptWithDetails: (details) {
             final data = details.data;
             final oldIndex = controller.items.indexOf(data);

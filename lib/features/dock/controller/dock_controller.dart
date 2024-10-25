@@ -4,11 +4,11 @@ import 'package:macos_dock/models/icon_model.dart';
 
 class DockController extends GetxController {
   final RxList<IconDataModel> items = <IconDataModel>[
-    IconDataModel(Icons.person, '/person'),
-    IconDataModel(Icons.message, '/message'),
-    IconDataModel(Icons.call, '/call'),
-    IconDataModel(Icons.camera, '/camera'),
-    IconDataModel(Icons.photo, '/photo'),
+    IconDataModel(1, Icons.person, '/person'),
+    IconDataModel(2, Icons.message, '/message'),
+    IconDataModel(3, Icons.call, '/call'),
+    IconDataModel(4, Icons.camera, '/camera'),
+    IconDataModel(5, Icons.photo, '/photo'),
   ].obs;
 
   final RxInt dragTargetIndex = (-1).obs;
@@ -25,6 +25,13 @@ class DockController extends GetxController {
   void startDragging(int index) {
     draggingIndex.value = index;
     isDragging.value = true;
+  }
+
+  void removeItem(int index) {
+    if (index > 0 && index < items.length) {
+      items.removeAt(index);
+      updateDock();
+    }
   }
 
   void resetDrag() {
