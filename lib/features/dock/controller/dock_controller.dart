@@ -28,7 +28,7 @@ class DockController extends GetxController {
   }
 
   void removeItem(int index) {
-    if (index > 0 && index < items.length) {
+    if (index >= 0 && index < items.length) {
       items.removeAt(index);
       updateDock();
     }
@@ -51,7 +51,6 @@ class DockController extends GetxController {
     items.refresh();
   }
 
-  // Handling null properly where intially it would be null as nothing is hovered and after hovering it should be null as well
   void setHoveredIndex(int? index) {
     hoveredIndex.value = index;
   }

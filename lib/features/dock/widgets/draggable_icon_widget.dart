@@ -39,12 +39,14 @@ class DraggableIcon extends StatelessWidget {
     }
 
     return Obx(() {
-      // final isDragging = controller.dragTargetIndex.value == index;
       final dragPosition = controller.dragPosition.value;
       final isBeingDragged = controller.draggingIndex.value == index;
 
       return LongPressDraggable<IconDataModel>(
         data: iconData,
+        dragAnchorStrategy: (draggable, context, position) {
+          return const Offset(maxSize / 2, maxSize / 2);
+        },
         feedback: Material(
           color: Colors.transparent,
           child: Container(
@@ -59,18 +61,22 @@ class DraggableIcon extends StatelessWidget {
             ),
           ),
         ),
-        childWhenDragging: const SizedBox(width: baseItemHeight),
+        childWhenDragging: const SizedBox(
+          width: baseItemHeight,
+          height: baseItemHeight,
+        ),
         onDragStarted: () {
           controller.startDragging(index);
         },
         onDragEnd: (details) {
-          //If outside the dock then thinking
-          // controller.resetDrag
-
-          //If the drag is inside the dock then reset
-          if (details.wasAccepted) {
-            controller.resetDrag();
+          // Remove item if dropped outside
+          if (!details.wasAccepted && controller.items.length > 1) {
+            controller.removeItem(index);
           }
+          controller.resetDrag();
+        },
+        onDraggableCanceled: (velocity, offset) {
+          controller.resetDrag();
         },
         child: DragTarget<IconDataModel>(
           builder: (context, candidateData, rejectedData) {
@@ -108,14 +114,10 @@ class DraggableIcon extends StatelessWidget {
             );
           },
           onWillAcceptWithDetails: (details) {
-            // Calculating the drop position based on the drag position using context of the screen
             final RenderBox box = context.findRenderObject() as RenderBox;
             final localPosition = box.globalToLocal(details.offset);
-
-            // Trying to determine if the drag is on the left or right half of the item
             bool isOnRightHalf = localPosition.dx > box.size.width / 2;
 
-            // Adjusting the target index based on the position within the item
             int targetIndex = index;
             if (isOnRightHalf) {
               targetIndex += 1;
@@ -125,25 +127,10 @@ class DraggableIcon extends StatelessWidget {
                 details.offset.dx / (baseItemHeight + 16), targetIndex);
             return true;
           },
-
-          //TODO: Fix It and Think it again
-          // onLeave: (data) {
-          //   if (data != null) {
-          //     final index =
-          //         controller.items.indexWhere((item) => item.id == data.id);
-          //     if (index != -1) {
-          //       final removedItem = controller.items[index];
-          //       controller.removeItem(index);
-          //       // onItem
-          //     }
-          //   }
-          //   controller.resetDrag();
-          // },
           onAcceptWithDetails: (details) {
             final data = details.data;
             final oldIndex = controller.items.indexOf(data);
 
-            // Calculating the final index based on the drop position
             final RenderBox box = context.findRenderObject() as RenderBox;
             final localPosition = box.globalToLocal(details.offset);
             bool isOnRightHalf = localPosition.dx > box.size.width / 2;
@@ -153,7 +140,6 @@ class DraggableIcon extends StatelessWidget {
               newIndex += 1;
             }
 
-            // Handling the case where we are dropping at the end of the IconData list
             if (newIndex > controller.items.length) {
               newIndex = controller.items.length;
             }

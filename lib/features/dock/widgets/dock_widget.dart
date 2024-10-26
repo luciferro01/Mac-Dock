@@ -14,17 +14,10 @@ class DockWidget extends StatelessWidget {
     return DragTarget<IconDataModel>(
       onWillAcceptWithDetails: (data) => true,
       onLeave: (data) {
-        if (data != null) {
-          final index =
-              controller.items.indexWhere((item) => item.id == data.id);
-          if (index != -1) {
-            final removedItem = controller.items[index];
-            controller.removeItem(index);
-            controller.updateDock();
-            //Resetting needs to be changed
-            // controller.resetDrag();
-          }
-        }
+        controller.setHoveredIndex(null);
+      },
+      onAcceptWithDetails: (data) {
+        controller.resetDrag();
       },
       builder: (context, candidateItems, rejectedItems) => Container(
         decoration: BoxDecoration(
